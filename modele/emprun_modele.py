@@ -102,3 +102,15 @@ class EmpruntModele:
         emprunt = cursor.fetchone()
         conn.close()
         return emprunt
+
+    @classmethod
+    def modifier_emprunt(cls, id_emprunt, id_livre, id_membre, date_emprunt, date_retour_prevu):
+        conn = ConnexionBase.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE Emprunts
+            SET id_livre=?, id_membre=?, date_emprunt=?, date_retour_prevu=?
+            WHERE id_emprunt=?
+        """, (id_livre, id_membre, date_emprunt, date_retour_prevu, id_emprunt))
+        conn.commit()
+        conn.close()

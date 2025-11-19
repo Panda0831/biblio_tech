@@ -7,6 +7,8 @@ from PySide6.QtCore import QDate
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from modele.emprun_modele import EmpruntModele
+from modele.livres_modele import LivresModel
+from modele.membres_modele import MembreModele
 
 
 class EmpruntsController:
@@ -44,6 +46,12 @@ class EmpruntsController:
         """Enregistrer un nouvel emprunt"""
         id_livre, ok1 = QInputDialog.getInt(self.parent, "Nouvel emprunt", "ID du livre :")
         if not ok1: return
+
+        # Vérifier si le livre existe
+        livre = LivresModel.get_livre_by_id(id_livre)
+        if not livre:
+            QMessageBox.warning(self.parent, "Erreur", "Ce livre n'existe pas !")
+            return
 
         id_membre, ok2 = QInputDialog.getInt(self.parent, "Nouvel emprunt", "ID du membre :")
         if not ok2: return
@@ -139,3 +147,65 @@ class EmpruntsController:
             QMessageBox.information(self.parent, "Détail emprunt", msg)
         else:
             QMessageBox.warning(self.parent, "Non trouvé", "Aucun emprunt avec cet ID.")
+        
+    def modifier(self):
+        selected = self.table.selectionModel().selectedRows()
+        if not selected:
+            QMessageBox.warning(self.parent, "Attention", "Sélectionnez un emprunt à modifier !")
+            return
+
+        row = selected[0].row()
+        model = self.table.model()
+        
+        emp_id = int(model.item(row, 0).text())
+        current_livre_id = int(model.item(row, 1).text())
+        current_membre_id = int(model.item(row, 2).text())
+        current_date_emprunt = model.item(row, 3).text()
+        current_date_prevue = model.item(row, 4).text()
+
+        # --- Modification ID Livre ---
+        new_livre_id, ok1 = QInputDialog.getInt(
+            self.parent, "Modifier", "Nouvel ID du livre :", 
+            value=current_livre_id
+        )
+        if not ok1: return
+
+        livre = LivresModel.get_livre_by_id(new_livre_id)
+        if not livre:
+            QMessageBox.warning(self.parent, "Erreur", "Ce livre n'existe pas !")
+            return
+
+        # --- Modification ID Membre ---
+        new_membre_id, ok2 = QInputDialog.getInt(
+            self.parent, "Modifier", "Nouvel ID du membre :", 
+            value=current_membre_id
+        )
+        if not ok2: return
+        
+        membre = MembreModele.get_membre_by_id(new_membre_id)
+        if not membre:
+            QMessageBox.warning(self.parent, "Erreur", "Ce membre n'existe pas !")
+            return
+
+        # --- Modification Dates ---
+        new_date_emprunt, ok3 = QInputDialog.getText(
+            self.parent, "Modifier", "Nouvelle date d'emprunt (AAAA-MM-JJ) :", 
+            text=current_date_emprunt
+        )
+        if not ok3: return
+
+        new_date_prevue, ok4 = QInputDialog.getText(
+            self.parent, "Modifier", "Nouvelle date de retour prévue (AAAA-MM-JJ) :", 
+            text=current_date_prevue
+        )
+        if not ok4: return
+
+        # --- Mise à jour ---
+        try:
+            EmpruntModele.modifier_emprunt(
+                emp_id, new_livre_id, new_membre_id, new_date_emprunt, new_date_prevue
+            )
+            QMessageBox.information(self.parent, "Succès", "Emprunt modifié avec succès !")
+            self.charger()
+        except Exception as e:
+            QMessageBox.critical(self.parent, "Erreur", f"Impossible de modifier :\n{str(e)}")

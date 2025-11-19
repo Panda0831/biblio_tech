@@ -1,7 +1,7 @@
 # main.py — VERSION 100% FONCTIONNELLE AVEC TON VRAI biblio.ui (QListView)
 
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
+from PySide6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView, QHeaderView
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt
 
@@ -24,45 +24,61 @@ class MainWindow(QWidget):
         # === STYLE BEAU ===
         self.setStyleSheet("""
             QWidget {
-                background-color: #2E2E2E;
-                color: #FFFFFF;
+                background-color: #2c3e50; /* Gris-bleu foncé */
+                color: #ecf0f1; /* Blanc cassé */
+                font-family: "Segoe UI";
             }
             QLabel#label_2 { 
-                font-size: 28pt;
+                font-size: 24pt;
                 font-weight: bold;
                 color: white;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #4A00E0, stop:1 #8E2DE2);
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8e44ad, stop:1 #3498db); /* Dégradé violet à bleu */
                 padding: 15px;
-                border-radius: 15px;
-                text-align: center;
+                border-radius: 10px;
             }
             QPushButton {
-                background-color: #007BFF;
+                background-color: #3498db; /* Bleu */
                 color: white;
                 border: none;
-                padding: 14px;
-                border-radius: 12px;
+                padding: 12px 20px;
+                border-radius: 8px;
                 font-weight: bold;
-                font-size: 12pt;
+                font-size: 11pt;
             }
             QPushButton:hover {
-                background-color: #0056b3;
+                background-color: #2980b9; /* Bleu plus foncé */
             }
-            QListView {
-                background-color: #3C3C3C;
-                border-radius: 15px;
-                padding: 10px;
-                font-size: 11pt;
-                color: #FFFFFF;
+            QTableView {
+                background-color: #34495e; /* Gris-bleu plus clair */
+                border: 1px solid #2c3e50;
+                border-radius: 8px;
+                font-size: 10pt;
+                selection-background-color: #3498db; /* Bleu pour la sélection */
             }
-            QPushButton#pushButton_3 {
-                background-color: #28a745;
+            QHeaderView::section {
+                background-color: #2c3e50;
+                color: #ecf0f1;
+                padding: 8px;
+                border: 1px solid #34495e;
+                font-weight: bold;
             }
-            QPushButton#pushButton_5 {
-                background-color: #007BFF;
+            QPushButton#pushButton_3 { /* Ajouter */
+                background-color: #27ae60; /* Vert */
             }
-            QPushButton#pushButton_4 {
-                background-color: #dc3545;
+            QPushButton#pushButton_3:hover {
+                background-color: #229954;
+            }
+            QPushButton#pushButton_5 { /* Modifier */
+                background-color: #f39c12; /* Orange */
+            }
+            QPushButton#pushButton_5:hover {
+                background-color: #d35400;
+            }
+            QPushButton#pushButton_4 { /* Supprimer */
+                background-color: #e74c3c; /* Rouge */
+            }
+            QPushButton#pushButton_4:hover {
+                background-color: #c0392b;
             }
         """)
 
@@ -70,6 +86,9 @@ class MainWindow(QWidget):
 
         self.table_view = self.ui.tableView
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # Rendre le tableau responsive
+        self.table_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
 
         # === Contrôleurs ===
         self.livres_ctrl = LivresController(self.table_view, self)
@@ -122,7 +141,10 @@ class MainWindow(QWidget):
 
     def modifier(self):
         if self.current_ctrl:
-            self.current_ctrl.modifier()
+            if self.current_ctrl == self.emprunts_ctrl:
+                self.emprunts_ctrl.retourner_livre()
+            else:
+                self.current_ctrl.modifier()
 
     def supprimer(self):
         if self.current_ctrl:
@@ -134,6 +156,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     window = MainWindow()
-    window.resize(800, 700)
+    window.resize(900, 700)
     window.show()
     sys.exit(app.exec())
