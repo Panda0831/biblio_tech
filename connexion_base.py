@@ -8,7 +8,6 @@ class ConnexionBase:
 
     @classmethod
     def initialisation_bd(cls):
-        """Crée les tables si elles n'existent pas déjà"""
         conn = cls.get_connection()
         cursor = conn.cursor()
 
