@@ -1,4 +1,3 @@
-# main.py — VERSION 100% FONCTIONNELLE AVEC TON VRAI biblio.ui (QListView)
 
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView, QHeaderView
@@ -7,7 +6,6 @@ from PySide6.QtCore import Qt
 
 from biblio_ui import Ui_Form
 
-# Importe tes contrôleurs
 from controller.livres_controller import LivresController
 from controller.categorie_controller import CategoriesController
 from controller.membre_controller import MembresController
@@ -21,7 +19,6 @@ class MainWindow(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        # === STYLE BEAU ===
         self.setStyleSheet("""
             QWidget {
                 background-color: #2c3e50; /* Gris-bleu foncé */
